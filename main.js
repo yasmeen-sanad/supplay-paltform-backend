@@ -9,7 +9,7 @@ const app = express();
 
 // 🔧 إعدادات CORS مبسطة وآمنة للفرونت
 const allowedOrigins = [
-  'construction-platform1.netlify.app',
+  'https://construction-platform1.netlify.app',
   'http://localhost:3000',
   'http://127.0.0.1:5500',
   'https://one23-6-l3re.onrender.com',
