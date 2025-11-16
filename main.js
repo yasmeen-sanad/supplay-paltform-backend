@@ -37,6 +37,9 @@ app.options('*', cors());
 // Middlewares
 app.use(express.json());
 
+// 👇 سمح للوصول إلى ملفات uploads كملفات ثابتة (static)
+app.use('/uploads', express.static('uploads'));
+
 // اتصال بقاعدة البيانات
 mongoose.connect(
   process.env.MONGODB_URI || 'mongodb+srv://buildmart:Construction-Platform-Backend@cluster0.nsddhfd.mongodb.net/buildmart?retryWrites=true&w=majority',
@@ -198,7 +201,7 @@ const addSampleProducts = async () => {
           description: 'أسمنت أبيض عالي الجودة للمباني',
           price: 25,
           category: 'مواد أساسية',
-          image: 'https://via.placeholder.com/300x200?text=أسمنت+أبيض',
+          image: '/uploads/cement.jpg',
           stock: 1000,
           supplier: 'شركة الاسمنت الوطنية',
           unit: 'كيس'
@@ -208,7 +211,7 @@ const addSampleProducts = async () => {
           description: 'رمل ناعم للبناء واللياسة',
           price: 12,
           category: 'مواد أساسية', 
-          image: 'https://via.placeholder.com/300x200?text=رمل+ناعم',
+          image: '/uploads/gravel.jpg',
           stock: 5000,
           supplier: 'محاجر الرياض',
           unit: 'طن'
@@ -218,7 +221,7 @@ const addSampleProducts = async () => {
           description: 'طوب أحمر عالي الجودة',
           price: 8,
           category: 'مواد بناء',
-          image: 'https://via.placeholder.com/300x200?text=طوب+أحمر',
+          image: '/uploads/bricks.jpg',
           stock: 20000,
           supplier: 'مصنع الطوب الأحمر',
           unit: 'قطعة'
@@ -228,7 +231,7 @@ const addSampleProducts = async () => {
           description: 'أسلاك كهربائية عالية الجودة',
           price: 15,
           category: 'ادوات كهربائية',
-          image: 'https://via.placeholder.com/300x200?text=أسلاك+كهربائية',
+          image: '/uploads/wires.jpg',
           stock: 500,
           supplier: 'شركة الكهرباء الوطنية',
           unit: 'متر'
@@ -238,7 +241,7 @@ const addSampleProducts = async () => {
           description: 'مواسير PVC للصرف الصحي',
           price: 30,
           category: 'ادوات صحية',
-          image: 'https://via.placeholder.com/300x200?text=مواسير+PVC',
+          image: '/uploads/pipes.jpg',
           stock: 800,
           supplier: 'مصنع المواسير',
           unit: 'متر'
@@ -701,27 +704,59 @@ app.get('/api/orders/:id', protect, async (req, res) => {
   }
 });
 
-// 🏭 GET Single Factory (لجلب تفاصيل مصنع معين)
-app.get('/api/factories/:id', async (req, res) => {
+/// 🏭 GET All Factories (أضفها هنا)
+app.get('/api/factories', async (req, res) => {
   try {
-    const factory = await Factory.findById(req.params.id);
+    const { 
+      specialization, 
+      city, 
+      verified, 
+      minRating,
+      search 
+    } = req.query;
     
-    if (!factory) {
-      return res.status(404).json({
-        success: false,
-        message: 'المصنع غير موجود'
-      });
+    let filter = { isActive: true };
+    
+    // Filter by specialization
+    if (specialization) {
+      filter.specialization = specialization;
+    }
+    
+    // Filter by city
+    if (city) {
+      filter['location.city'] = city;
+    }
+    
+    // Filter by verified status
+    if (verified !== undefined) {
+      filter.isVerified = verified === 'true';
+    }
+    
+    // Filter by minimum rating
+    if (minRating) {
+      filter.rating = { $gte: Number(minRating) };
+    }
+    
+    // Search by name or description
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } }
+      ];
     }
 
+    const factories = await Factory.find(filter).sort({ rating: -1, reviewsCount: -1 });
+    
     res.status(200).json({
       success: true,
-      factory
+      count: factories.length,
+      factories
     });
 
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: 'خطأ في جلب المصنع',
+      message: 'خطأ في جلب المصانع',
       error: error.message
     });
   }
