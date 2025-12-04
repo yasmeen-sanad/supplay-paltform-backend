@@ -10,7 +10,7 @@ import statsRoutes from "./routes/stats.routes";
 import brandRoutes from "./routes/brand.routes";
 
 export const allowedOrigins = [
-  "https://construction-platform1.netlify.app",
+  "https://supply-platform.netlify.app",
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:5001",
