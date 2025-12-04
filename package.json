@@ -2,10 +2,11 @@
   "name": "buildmart-backend",
   "version": "3.0.0",
   "description": "Backend for Building Materials Platform",
-  "main": "main.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node main.js",
-    "dev": "nodemon main.js",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "test": "jest"
   },
   "dependencies": {
@@ -20,10 +21,20 @@
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^7.0.0",
     "mongoose": "^7.5.0",
+    "multer": "^2.0.2",
     "nodemailer": "^6.9.7"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@types/bcryptjs": "^2.4.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.5",
+    "@types/mongoose": "^5.11.97",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.11.30",
+    "nodemon": "^3.1.11",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.0"
   },
   "engines": {
     "node": ">=18.0.0"
