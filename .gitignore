@@ -19,4 +19,4 @@ pnpm-debug.log*
 
 # misc
 .DS_Store
-.vscode/
+.vscode/node_modules/
