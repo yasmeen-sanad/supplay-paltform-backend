@@ -9,6 +9,7 @@ import factoryRoutes from "./routes/factory.routes"
 import notificationRoutes from "./routes/notification.routes"
 import statsRoutes from "./routes/stats.routes"
 import brandRoutes from "./routes/brand.routes"
+import adminRoutes from "./routes/admin.routes"
 
 export const allowedOrigins = [
   "https://supply-platform.netlify.app",
@@ -72,6 +73,7 @@ app.use("/api/factories", factoryRoutes)
 app.use("/api/brands", brandRoutes)
 app.use("/api/notifications", notificationRoutes)
 app.use("/api/stats", statsRoutes)
+app.use("/api/admin", adminRoutes)
 
 // 404 Handler
 app.use((req: Request, res: Response) => {

@@ -61,3 +61,26 @@ export const restrictTo = (...roles: Array<IUser["role"]>) => {
     next();
   };
 };
+
+export const requireApprovedSeller = (req: AuthedRequest, res: Response, next: NextFunction) => {
+  if (!req.user) {
+    return res.status(401).json({
+      success: false,
+      message: "غير مصرح بالدخول، يرجى تسجيل الدخول",
+    });
+  }
+
+  if (req.user.role === "seller") {
+    const vendorStatus = (req.user as any).vendorStatus;
+    if (vendorStatus !== "approved") {
+      return res.status(403).json({
+        success: false,
+        message: vendorStatus === "rejected" 
+          ? "تم رفض حسابك من قبل الإدارة. لا يمكنك إضافة منتجات أو مصانع."
+          : "حسابك قيد المراجعة. يجب أن يتم اعتماد حسابك قبل إضافة منتجات أو مصانع.",
+      });
+    }
+  }
+
+  next();
+};

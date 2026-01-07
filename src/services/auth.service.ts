@@ -23,14 +23,21 @@ export async function registerUser(data: {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create({
+  const userData: any = {
     name,
     email,
     password: hashedPassword,
     phone,
     address,
     role: role || "customer",
-  });
+  };
+
+  // Set vendorStatus to "pending" for new sellers
+  if (role === "seller") {
+    userData.vendorStatus = "pending";
+  }
+
+  const newUser = await User.create(userData);
 
   const token = signToken(newUser._id.toString());
 
@@ -41,6 +48,7 @@ export async function registerUser(data: {
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
+      vendorStatus: (newUser as any).vendorStatus,
     },
   };
 }
@@ -71,6 +79,11 @@ export async function loginUser(data: {
     throw new Error("INVALID_PASSWORD");
   }
 
+  // Check if seller is rejected
+  if (user.role === "seller" && (user as any).vendorStatus === "rejected") {
+    throw new Error("SELLER_REJECTED");
+  }
+
   const token = signToken(user._id.toString());
 
   return {
@@ -81,6 +94,7 @@ export async function loginUser(data: {
       email: user.email,
       phone: user.phone,
       role: user.role,
+      vendorStatus: (user as any).vendorStatus,
     },
   };
 }

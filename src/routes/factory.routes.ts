@@ -9,7 +9,7 @@ import {
   updateFactory,
   deleteFactory,
 } from "../controllers/factory.controller";
-import { protect, restrictTo } from "../middleware/auth.middleware";
+import { protect, restrictTo, requireApprovedSeller } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -36,9 +36,9 @@ router.get("/", getFactories);
 
 // Seller-protected endpoints
 router.use(protect, restrictTo("seller"));
-router.post("/", upload.single("image"), createFactory);
+router.post("/", requireApprovedSeller, upload.single("image"), createFactory);
 router.get("/me/mine", getMyFactories);
-router.patch("/:id", upload.single("image"), updateFactory);
-router.delete("/:id", deleteFactory);
+router.patch("/:id", requireApprovedSeller, upload.single("image"), updateFactory);
+router.delete("/:id", requireApprovedSeller, deleteFactory);
 
 export default router;

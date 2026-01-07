@@ -62,6 +62,12 @@ export async function login(req: Request, res: Response) {
         message: "كلمة المرور غير صحيحة",
       });
     }
+    if (error.message === "SELLER_REJECTED") {
+      return res.status(403).json({
+        success: false,
+        message: "تم رفض حسابك من قبل الإدارة. يرجى التواصل مع الدعم للمزيد من المعلومات.",
+      });
+    }
 
     return res.status(500).json({
       success: false,
@@ -83,6 +89,7 @@ export async function me(req: AuthedRequest, res: Response) {
       name: req.user.name,
       email: req.user.email,
       role: req.user.role,
+      vendorStatus: (req.user as any).vendorStatus,
       phone: req.user.phone,
       address: req.user.address,
       city: req.user.city,
@@ -124,6 +131,7 @@ export async function updateProfile(req: AuthedRequest, res: Response) {
         name: updated.name,
         email: updated.email,
         role: updated.role,
+        vendorStatus: (updated as any).vendorStatus,
         phone: updated.phone,
         address: updated.address,
         city: updated.city,

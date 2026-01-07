@@ -11,7 +11,14 @@ import {
   updateProduct,
   deleteProduct,
 } from "../controllers/product.controller";
-import { protect, restrictTo } from "../middleware/auth.middleware";
+import { protect, restrictTo, requireApprovedSeller } from "../middleware/auth.middleware";
+import {
+  validateProductCreation,
+  validateProductUpdate,
+  validateProductSearch,
+  validateMongoId,
+  handleValidationErrors
+} from "../middleware/validation.middleware";
 
 const router = Router();
 
@@ -35,14 +42,14 @@ const upload = multer({ storage });
 
 // Public endpoints
 router.get("/", getProducts);
-router.get("/search", searchProductsHandler);
-router.get("/:id", getProduct);
+router.get("/search", validateProductSearch, handleValidationErrors, searchProductsHandler);
+router.get("/:id", validateMongoId("id"), handleValidationErrors, getProduct);
 
 // Seller-protected endpoints
 router.use(protect, restrictTo("seller"));
-router.post("/", upload.single("image"), createProduct);
+router.post("/", requireApprovedSeller, upload.single("image"), validateProductCreation, handleValidationErrors, createProduct);
 router.get("/me/mine", getMyProducts);
-router.patch("/:id", upload.single("image"), updateProduct);
-router.delete("/:id", deleteProduct);
+router.patch("/:id", requireApprovedSeller, upload.single("image"), validateMongoId("id"), validateProductUpdate, handleValidationErrors, updateProduct);
+router.delete("/:id", requireApprovedSeller, validateMongoId("id"), handleValidationErrors, deleteProduct);
 
 export default router;

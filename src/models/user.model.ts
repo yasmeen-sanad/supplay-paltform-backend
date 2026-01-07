@@ -10,6 +10,7 @@ export interface IUser extends Document {
   city?: string;
   logo?: string;
   role: "customer" | "admin" | "seller";
+  vendorStatus?: "pending" | "approved" | "rejected";
   shippingMethod?: "standard" | "express" | "same-day";
   createdAt?: Date;
   updatedAt?: Date;
@@ -44,6 +45,11 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ["customer", "admin", "seller"],
       default: "customer",
+    },
+    vendorStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: undefined,
     },
     shippingMethod: {
       type: String,

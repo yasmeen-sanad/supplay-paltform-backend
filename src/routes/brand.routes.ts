@@ -3,7 +3,7 @@ import path from "path";
 import fs from "fs";
 import multer from "multer";
 import { getBrands, getMyBrand, updateMyBrand, updateMyBrandLogo } from "../controllers/brand.controller";
-import { protect, restrictTo } from "../middleware/auth.middleware";
+import { protect, restrictTo, requireApprovedSeller } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -31,7 +31,7 @@ router.get("/", getBrands);
 // Seller-only: manage own brand
 router.use(protect, restrictTo("seller"));
 router.get("/me", getMyBrand);
-router.patch("/me", updateMyBrand);
-router.post("/me/logo", upload.single("logo"), updateMyBrandLogo);
+router.patch("/me", requireApprovedSeller, updateMyBrand);
+router.post("/me/logo", requireApprovedSeller, upload.single("logo"), updateMyBrandLogo);
 
 export default router;
